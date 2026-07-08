@@ -17,9 +17,7 @@ public class MoviesController : Controller
         _context = context;
     }
 
-    // ==========================================
-    // 🔍 ၁။ INDEX METHOD (SEARCH & GENRE FILTER)
-    // ==========================================
+    
     public async Task<IActionResult> Index(string movieGenre, string searchString)
     {
         IQueryable<string> genreQuery = from m in _context.Movie
@@ -50,9 +48,7 @@ public class MoviesController : Controller
         return View(movieGenreVM);
     }
 
-    // ==========================================
-    // ➕ ၂။ CREATE METHOD (GET & POST)
-    // ==========================================
+    
     public IActionResult Create()
     {
         return View();
@@ -71,9 +67,7 @@ public class MoviesController : Controller
         return View(movie);
     }
 
-    // ==========================================
-    // 📝 ၃။ EDIT METHOD (GET & POST)
-    // ==========================================
+    
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -122,9 +116,7 @@ public class MoviesController : Controller
         return View(movie);
     }
 
-    // ==========================================
-    // ℹ️ ၄။ DETAILS METHOD (ရုပ်ရှင်အသေးစိတ်ကြည့်ရန်)
-    // ==========================================
+    
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
@@ -140,10 +132,7 @@ public class MoviesController : Controller
         return View(movie);
     }
 
-    // ==========================================
-    // 🗑️ ၅။ DELETE METHOD (GET & POST)
-    // ==========================================
-    // GET: Movies/Delete/5
+   
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -151,7 +140,6 @@ public class MoviesController : Controller
             return BadRequest();
         }
 
-        // 💡 ပြင်ဆင်ချက် - FirstOrDefault ကို FirstOrDefaultAsync ဟု ပြောင်းလဲထားပါသည်
         var movie = await _context.Movie.FirstOrDefaultAsync(m => m.Id == id);
         if (movie == null)
         {
@@ -160,7 +148,6 @@ public class MoviesController : Controller
         return View(movie);
     }
 
-    // POST: Movies/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
