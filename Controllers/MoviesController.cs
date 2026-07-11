@@ -195,7 +195,7 @@ public class MoviesController : Controller
     }
 
     // GET: Movies/Delete/5
-    [Authorize(Roles = "Admin")] // 👈 Admin သာလျှင် ဖျက်မည့် စာမျက်နှာ ဝင်ခွင့်ရှိမည်
+    [Authorize(Roles = "Admin")] 
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null) return BadRequest();

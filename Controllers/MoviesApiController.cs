@@ -6,7 +6,7 @@ using MVCMovie.Models;
 
 namespace MVCMovie.Controllers;
 
-[Authorize] // Login ဝင်ထားသူများသာ သုံးခွင့်ရမည်
+[Authorize] 
 [ApiController]
 [Route("api/movies")]
 public class MoviesApiController : ControllerBase
@@ -34,13 +34,11 @@ public class MoviesApiController : ControllerBase
 
         if (favourite == null)
         {
-            // မရှိသေးရင် Favourite ထဲထည့်မယ်
             _context.UserFavourites.Add(new UserFavourite { UserId = userId, MovieId = movieId });
             isFavourite = true;
         }
         else
         {
-            // ရှိပြီးသားဆိုရင် Favourite ထဲက ပြန်ဖြုတ်မယ်
             _context.UserFavourites.Remove(favourite);
             isFavourite = false;
         }
@@ -63,13 +61,11 @@ public class MoviesApiController : ControllerBase
 
         if (save == null)
         {
-            // မရှိသေးရင် Save ထဲထည့်မယ်
             _context.UserSaves.Add(new UserSave { UserId = userId, MovieId = movieId });
             isSaved = true;
         }
         else
         {
-            // ရှိပြီးသားဆိုရင် Save ထဲက ပြန်ဖြုတ်မယ်
             _context.UserSaves.Remove(save);
             isSaved = false;
         }
