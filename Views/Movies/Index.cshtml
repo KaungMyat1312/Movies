@@ -1,4 +1,4 @@
-﻿@model MVCMovie.Models.MovieGenreViewModel
+﻿@model IEnumerable<MVCMovie.Models.Movie>
 
 @{
     ViewData["Title"] = "Index";
@@ -6,55 +6,182 @@
 
 <h2>Movie Directory</h2>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</p>
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </p>
+}
 
 <form asp-controller="Movies" asp-action="Index" method="get" class="mb-4">
-    <p>
-        Genre:
-        <select asp-for="MovieGenre" asp-items="Model.Genres" class="form-select" style="display:inline-block; width:auto;">
-            <option value="">All</option>
-        </select>
-
-        Title:
-        <input type="text" asp-for="SearchString" class="form-control" style="display:inline-block; width:auto;" />
-
-        <input type="submit" value="Filter" class="btn btn-success" />
-    </p>
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <label class="col-form-label">Title:</label>
+        </div>
+        <div class="col-auto">
+            <input type="text" name="searchString" value="@Context.Request.Query["searchString"]" class="form-control" />
+        </div>
+        <div class="col-auto">
+            <input type="submit" value="Filter" class="btn btn-success" />
+        </div>
+    </div>
 </form>
 
-<table class="table">
+<table class="table table-striped align-middle">
     <thead>
         <tr>
+            <th>Poster</th>
             <th>Title</th>
+            <th>Description</th>
             <th>Release Date</th>
-            <th>Genre</th>
-            <th>Price</th>
+            <th>Duration (Mins)</th>
             <th>Rating</th>
+            <th>Status</th>
+            <th style="width: 220px;">Actions</th>
         </tr>
     </thead>
     <tbody>
-        @if (Model.Movies != null)
+        @if (Model != null && Model.Any())
         {
-            foreach (var item in Model.Movies)
+            foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.Title</td>
-                    <td>@item.ReleaseDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.Genre</td>
-                    <td>@item.Price</td>
-                    <td>@item.Rating</td>
-                    
-
-                 
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        @if (!string.IsNullOrEmpty(item.PosterUrl))
+                        {
+                            <img src="@item.PosterUrl" alt="Poster" style="width: 60px; height: auto; border-radius: 4px;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">No Poster</span>
+                        }
+                    </td>
+                    <td><strong>@item.Title</strong></td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.Description) && item.Description.Length > 50)
+                        {
+                            @(item.Description.Substring(0, 50) + "...")
+                        }
+                        else
+                        {
+                            @item.Description
+                        }
+                    </td>
+                    <td>@item.ReleaseDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.Duration mins</td>
+                    <td><span class="badge bg-secondary">@item.Rating</span></td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="mb-2 d-flex gap-1">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info flex-fill">Details</a>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            }
+                        </div>
+
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-danger favourite-btn flex-fill" data-movie-id="@item.Id">
+                                ❤️ <span class="fav-text">Favourite</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary save-btn flex-fill" data-movie-id="@item.Id">
+                                🔖 <span class="save-text">Save</span>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             }
         }
+        else
+        {
+            <tr>
+                <td colspan="8" class="text-center text-muted">No movies found.</td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // --- 1. Favourite Button AJAX ---
+            document.querySelectorAll('.favourite-btn').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const movieId = this.getAttribute('data-movie-id');
+                    const textSpan = this.querySelector('.fav-text');
+
+                    try {
+                        const response = await fetch('/api/movies/toggle-favourite', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(parseInt(movieId))
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            if (result.isFavourite) {
+                                this.classList.remove('btn-outline-danger');
+                                this.classList.add('btn-danger');
+                                textSpan.textContent = 'Favorited';
+                            } else {
+                                this.classList.remove('btn-danger');
+                                this.classList.add('btn-outline-danger');
+                                textSpan.textContent = 'Favourite';
+                            }
+                        } else if (response.status === 401) {
+                            alert("Please login first to favourite this movie!");
+                        }
+                    } catch (error) {
+                        console.error("Error toggling favourite:", error);
+                    }
+                });
+            });
+
+            // --- 2. Save Button AJAX ---
+            document.querySelectorAll('.save-btn').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const movieId = this.getAttribute('data-movie-id');
+                    const textSpan = this.querySelector('.save-text');
+
+                    try {
+                        const response = await fetch('/api/movies/toggle-save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(parseInt(movieId))
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            if (result.isSaved) {
+                                this.classList.remove('btn-outline-primary');
+                                this.classList.add('btn-primary');
+                                textSpan.textContent = 'Saved';
+                            } else {
+                                this.classList.remove('btn-primary');
+                                this.classList.add('btn-outline-primary');
+                                textSpan.textContent = 'Save';
+                            }
+                        } else if (response.status === 401) {
+                            alert("Please login first to save this movie!");
+                        }
+                    } catch (error) {
+                        console.error("Error toggling save:", error);
+                    }
+                });
+            });
+
+        });
+    </script>
+}

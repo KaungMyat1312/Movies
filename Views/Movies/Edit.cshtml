@@ -1,65 +1,101 @@
-﻿@model MVCMovie.Models.Movie
+﻿@model MVCMovie.ViewModels.MovieFormViewModel
 
 @{
     ViewData["Title"] = "Edit Movie";
 }
 
-<h2>Edit Movie</h2>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Edit Movie</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
 
-<form asp-action="Edit" method="post">
-    <div class="form-horizontal">
-        <h4>Movie Information</h4>
-        <hr />
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-bold"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
 
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
 
-        <input type="hidden" asp-for="Id" />
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ReleaseDate" class="form-label fw-bold"></label>
+                                <input asp-for="ReleaseDate" class="form-control" />
+                                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Duration" class="form-label fw-bold"></label>
+                                <input asp-for="Duration" class="form-control" />
+                                <span asp-validation-for="Duration" class="text-danger"></span>
+                            </div>
+                        </div>
 
-        <div class="form-group">
-            <label asp-for="Title" class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Rating" class="form-label fw-bold">IMDb Rating</label>
+                                <input asp-for="Rating" class="form-control" placeholder="e.g. 7.3, 8.5" />
+                                <span asp-validation-for="Rating" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PosterUrl" class="form-label fw-bold"></label>
+                                <input asp-for="PosterUrl" class="form-control" />
+                                <span asp-validation-for="PosterUrl" class="text-danger"></span>
+                            </div>
+                        </div>
 
-        <div class="form-group">
-            <label asp-for="ReleaseDate" class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <input asp-for="ReleaseDate" class="form-control" />
-                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
-            </div>
-        </div>
+                        <div class="mb-3">
+                            <label asp-for="TrailerUrl" class="form-label fw-bold"></label>
+                            <input asp-for="TrailerUrl" class="form-control" />
+                            <span asp-validation-for="TrailerUrl" class="text-danger"></span>
+                        </div>
 
-        <div class="form-group">
-            <label asp-for="Genre" class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <input asp-for="Genre" class="form-control" />
-                <span asp-validation-for="Genre" class="text-danger"></span>
-            </div>
-        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold d-block">Movie Categories</label>
+                            <div class="card p-3 bg-light">
+                                <div class="row">
+                                    @for (int i = 0; i < Model.AvailableCategories.Count; i++)
+                                    {
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                <input type="hidden" asp-for="@Model.AvailableCategories[i].CategoryId" />
+                                                <input type="hidden" asp-for="@Model.AvailableCategories[i].CategoryName" />
+                                                <input asp-for="@Model.AvailableCategories[i].IsSelected" class="form-check-input" type="checkbox" />
+                                                <label asp-for="@Model.AvailableCategories[i].IsSelected" class="form-check-label">
+                                                    @Model.AvailableCategories[i].CategoryName
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
 
-        <div class="form-group">
-            <label asp-for="Price" class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="form-group mb-3">
-            <label asp-for="Rating" class="control-label"></label>
-            <input asp-for="Rating" class="form-control" />
-            <span asp-validation-for="Rating" class="text-danger"></span>
-        </div>
-        
-        <div class="form-group" style="margin-top: 15px;">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        <div class="form-check mb-4">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsActive" class="form-check-label fw-bold">Published (Visible to public)</label>
+                        </div>
+
+                        <div class="d-flex justify-content-between border-top pt-3">
+                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4">Update Movie</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</form>
+</div>
 
 @section Scripts {
     @{

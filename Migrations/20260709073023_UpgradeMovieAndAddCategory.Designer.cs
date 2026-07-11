@@ -4,6 +4,7 @@ using MVCMovie.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVCMovie.Migrations
 {
     [DbContext(typeof(MovieContext))]
-    partial class MovieContextModelSnapshot : ModelSnapshot
+    [Migration("20260709073023_UpgradeMovieAndAddCategory")]
+    partial class UpgradeMovieAndAddCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,42 +172,6 @@ namespace MVCMovie.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("MovieCategories");
-                });
-
-            modelBuilder.Entity("MVCMovie.Models.UserFavourite", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FavoritedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("UserId", "MovieId");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("UserFavourites");
-                });
-
-            modelBuilder.Entity("MVCMovie.Models.UserSave", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SavedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("UserId", "MovieId");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("UserSaves");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -363,44 +330,6 @@ namespace MVCMovie.Migrations
                     b.Navigation("Movie");
                 });
 
-            modelBuilder.Entity("MVCMovie.Models.UserFavourite", b =>
-                {
-                    b.HasOne("MVCMovie.Models.Movie", "Movie")
-                        .WithMany("UserFavourites")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MVCMovie.Models.ApplicationUser", "User")
-                        .WithMany("UserFavourites")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movie");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MVCMovie.Models.UserSave", b =>
-                {
-                    b.HasOne("MVCMovie.Models.Movie", "Movie")
-                        .WithMany("UserSaves")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MVCMovie.Models.ApplicationUser", "User")
-                        .WithMany("UserSaves")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movie");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -452,13 +381,6 @@ namespace MVCMovie.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MVCMovie.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("UserFavourites");
-
-                    b.Navigation("UserSaves");
-                });
-
             modelBuilder.Entity("MVCMovie.Models.Category", b =>
                 {
                     b.Navigation("MovieCategories");
@@ -467,10 +389,6 @@ namespace MVCMovie.Migrations
             modelBuilder.Entity("MVCMovie.Models.Movie", b =>
                 {
                     b.Navigation("MovieCategories");
-
-                    b.Navigation("UserFavourites");
-
-                    b.Navigation("UserSaves");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,41 +12,48 @@ public static class SeedData
         using (var context = new MovieContext(
             serviceProvider.GetRequiredService<DbContextOptions<MovieContext>>()))
         {
-            
-            if (context.Movie.Any())
+            if (context.Movies.Any())
             {
-                return;   
+                return;  
             }
 
-            
-            context.Movie.AddRange(
+            context.Movies.AddRange(
                 new Movie
                 {
                     Title = "When Harry Met Sally",
+                    Description = "Harry and Sally have known each other for years, and are very good friends, but they fear sex would ruin the friendship.",
                     ReleaseDate = DateTime.Parse("1989-2-12"),
-                    Genre = "Romantic Comedy",
-                    Price = 7.99M,
-                    Rating = "PG" 
+                    Duration = 95,
+                    Rating = "R",
+                    PosterUrl = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500", 
+                    TrailerUrl = "https://www.youtube.com/watch?v=V8DgDmUHVto",
+                    IsActive = true
                 },
                 new Movie
                 {
-                    Title = "Ghostbusters ",
-                    ReleaseDate = DateTime.Parse("1984-3-13"),
-                    Genre = "Comedy",
-                    Price = 8.99M,
-                    Rating = "PG-13"
+                    Title = "Ghostbusters",
+                    Description = "Three eccentric parapsychologists start a ghost-catching business in New York City.",
+                    ReleaseDate = DateTime.Parse("1984-6-8"),
+                    Duration = 105,
+                    Rating = "PG",
+                    PosterUrl = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500",
+                    TrailerUrl = "https://www.youtube.com/watch?v=6hDkhw5WKas",
+                    IsActive = true
                 },
                 new Movie
                 {
                     Title = "Ghostbusters 2",
-                    ReleaseDate = DateTime.Parse("1986-2-23"),
-                    Genre = "Comedy",
-                    Price = 9.99M,
-                    Rating = "PG-13"
+                    Description = "The discovery of a massive river of ectoplasm and a revival of spectral activity allows the staff of Ghostbusters to revive the business.",
+                    ReleaseDate = DateTime.Parse("1989-6-16"),
+                    Duration = 108,
+                    Rating = "PG",
+                    PosterUrl = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500",
+                    TrailerUrl = "https://www.youtube.com/watch?v=UnzH75IFwwU",
+                    IsActive = true
                 }
             );
 
-            context.SaveChanges(); 
+            context.SaveChanges();
         }
     }
 }
