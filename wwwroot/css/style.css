@@ -406,7 +406,7 @@
             font-weight: bold;
         }
 
-    /* Global Arrow Design for Hero Swiper as well */
+    /*  Arrow Design */
     #hero-next,
     #hero-prev {
         color: #ffffff;
@@ -728,7 +728,7 @@
         margin: 120px auto 50px auto;
         padding: 35px;
         background: #11141a;
-        border: 1px solid rgba(220, 53, 69, 0.2); /* Red warning border subtleness */
+        border: 1px solid rgba(220, 53, 69, 0.2); 
         border-radius: 8px;
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
     }
@@ -968,4 +968,186 @@
         border-color: #ffc107;
         color: #ffc107;
         background: rgba(255, 193, 7, 0.08);
+    }
+
+/* Auth Page Background Base Styling */
+.auth-body {
+    background: #0b0e14 !important;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Cinematic Ambient Glowing Background Design */
+.auth-glow-1 {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: rgba(255, 193, 7, 0.12);
+    border-radius: 50%;
+    filter: blur(90px);
+    top: 10%;
+    left: 15%;
+    z-index: 1;
+}
+
+.auth-glow-2 {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    background: rgba(13, 110, 253, 0.08);
+    border-radius: 50%;
+    filter: blur(120px);
+    bottom: 10%;
+    right: 15%;
+    z-index: 1;
+}
+
+/* Glassmorphism Auth Container Card */
+.auth-card {
+    background: rgba(17, 20, 26, 0.8) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 40px 35px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    z-index: 5;
+}
+
+/* DatShin Premium Logo Style */
+.auth-brand {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+    .auth-brand span {
+        color: #ffc107;
+    }
+
+/* Input Fields Container */
+.auth-input-group {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+    .auth-input-group i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        font-size: 1.25rem;
+        transition: color 0.3s ease;
+    }
+
+/* Custom Styled Input Form Controls */
+.auth-form-control {
+    width: 100%;
+    padding: 13px 16px 13px 48px;
+    background: rgba(24, 32, 47, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px;
+    color: #fff !important;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .auth-form-control::placeholder {
+        color: #475569;
+    }
+
+    .auth-form-control:focus {
+        border-color: #ffc107 !important;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.15) !important;
+        outline: none;
+        background: rgba(24, 32, 47, 0.8) !important;
+    }
+
+        .auth-form-control:focus + i {
+            color: #ffc107;
+        }
+
+/* Labels and Meta Content */
+.auth-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    margin-bottom: 28px;
+}
+
+    .auth-meta a {
+        color: #ffc107;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+        .auth-meta a:hover {
+            text-decoration: underline;
+        }
+
+/* Custom Checkbox Design */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+}
+
+    .form-check-input:checked {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+    }
+
+/* Primary Form Action Button */
+.btn-login-submit {
+    background: #ffc107 !important;
+    color: #0b0e14 !important;
+    border: none;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease !important;
+}
+
+    .btn-login-submit:hover {
+        background: #e0a800 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+    }
+
+    .btn-login-submit:active {
+        transform: translateY(0);
+    }
+/* Login list section items adjustment */
+.login-menu-container {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+    .login-menu-container li {
+        list-style-type: none !important;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .login-menu-container form {
+        display: inline;
+        margin: 0;
     }

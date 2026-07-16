@@ -1,0 +1,82 @@
+﻿@page
+@model LoginModel
+
+@{
+    Layout = null; 
+    ViewData["Title"] = "Log in";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DatShin</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
+
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+</head>
+<body class="auth-body">
+
+    <div class="auth-glow-1"></div>
+    <div class="auth-glow-2"></div>
+
+    <div class="auth-card">
+        <div class="auth-brand">
+            Dat<span>Shin</span> <i class='bx bx-camera-movie' style="color: var(--main-color);"></i>
+        </div>
+
+        <h5 class="text-white-50 text-center mb-4" style="font-size: 0.95rem; font-weight: 400; letter-spacing: 0.5px;">
+            Use your local account to log in.
+        </h5>
+
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3" role="alert"></div>
+
+            <div class="auth-input-group">
+                <input asp-for="Input.Email" class="auth-form-control" autocomplete="username" aria-required="true" placeholder="Email Address" />
+                <i class='bx bx-envelope'></i>
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+
+            <div class="auth-input-group">
+                <input asp-for="Input.Password" type="password" class="auth-form-control" autocomplete="current-password" aria-required="true" placeholder="Password" />
+                <i class='bx bx-lock-alt'></i>
+                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            </div>
+
+            <div class="auth-meta">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    <label asp-for="Input.RememberMe" class="form-check-label text-white-50">
+                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                    </label>
+                </div>
+                <a id="forgot-password" asp-page="./ForgotPassword">Forgot?</a>
+            </div>
+
+            <button id="login-submit" type="submit" class="btn fw-bold w-100 py-2 btn-login-submit">
+                Sign In
+            </button>
+
+            <div class="text-center mt-4 pt-2" style="border-top: 1px solid rgba(255,255,255,0.05);">
+                <p class="mb-2">
+                    <span class="text-white-50" style="font-size: 0.9rem;">Don't have an account?</span>
+                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" style="color: #ffc107; font-size: 0.9rem; font-weight: 600; text-decoration: none;">Register</a>
+                </p>
+                <p class="m-0">
+                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" style="font-size: 0.82rem; color: #8a8d93; text-decoration: none;">
+                        <i class='bx bx-refresh' style="vertical-align: middle;"></i> Resend email confirmation
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

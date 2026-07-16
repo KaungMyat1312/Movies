@@ -1,0 +1,75 @@
+﻿@page
+@model RegisterModel
+@{
+    Layout = null; 
+    ViewData["Title"] = "Register";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DatShin</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
+
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+</head>
+<body class="auth-body">
+
+    <div class="auth-glow-1"></div>
+    <div class="auth-glow-2"></div>
+
+    <div class="auth-card">
+
+        <div class="d-flex justify-content-center mb-3">
+            <a asp-page="./Login" style="font-size: 2.2rem; font-weight: 700; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                Dat<span style="color: #ffc107;">Shin</span> <i class='bx bx-camera-movie' style="color: #ffc107;"></i>
+            </a>
+        </div>
+
+        <h5 class="text-white-50 text-center mb-4" style="font-size: 0.95rem; font-weight: 400; letter-spacing: 0.5px;">
+            Create a new account.
+        </h5>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3" role="alert"></div>
+
+            <div class="auth-input-group">
+                <input asp-for="Input.Email" class="auth-form-control" autocomplete="username" aria-required="true" placeholder="Email Address" />
+                <i class='bx bx-envelope'></i>
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+
+            <div class="auth-input-group">
+                <input asp-for="Input.Password" type="password" class="auth-form-control" autocomplete="new-password" aria-required="true" placeholder="Password" />
+                <i class='bx bx-lock-alt'></i>
+                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            </div>
+
+            <div class="auth-input-group">
+                <input asp-for="Input.ConfirmPassword" type="password" class="auth-form-control" autocomplete="new-password" aria-required="true" placeholder="Confirm Password" />
+                <i class='bx bx-check-shield'></i>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="btn fw-bold w-100 py-2 btn-login-submit mt-2">
+                Sign Up
+            </button>
+
+            <div class="text-center mt-4 pt-2" style="border-top: 1px solid rgba(255,255,255,0.05);">
+                <p class="m-0">
+                    <span class="text-white-50" style="font-size: 0.9rem;">Already have an account?</span>
+                    <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" style="color: #ffc107; font-size: 0.9rem; font-weight: 600; text-decoration: none;">Login here</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>
