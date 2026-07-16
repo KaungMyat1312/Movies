@@ -1,187 +1,122 @@
 ﻿@model IEnumerable<MVCMovie.Models.Movie>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Home - DatShin";
+    var displayMovies = User.IsInRole("Admin") ? Model : Model.Where(m => m.IsActive);
+
+    bool isSearch = ViewData["IsSearch"] as bool? ?? false;
 }
 
-<h2>Movie Directory</h2>
-
-@if (User.IsInRole("Admin"))
+@if (!isSearch)
 {
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Create New</a>
-    </p>
+    <section class="home custom-container" id="home">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                @if (displayMovies != null && displayMovies.Any())
+                {
+                    @foreach (var movie in displayMovies.Take(3))
+                    {
+                        <div class="swiper-slide">
+                            <img src="@(movie.PosterUrl.StartsWith("http") ? movie.PosterUrl : Url.Content("~/" + movie.PosterUrl))" alt="@movie.Title" class="home-img">
+                            <div class="home-text">
+                                <h1 class="home-title">@movie.Title</h1>
+                                <p class="home-meta">
+                                    <i class='bx bx-time-five'></i> @movie.Duration mins |
+                                    <i class='bx bxs-star' style="color: var(--main-color);"></i> @movie.Rating |
+                                    <i class='bx bx-calendar'></i> @movie.ReleaseDate.ToString("yyyy")
+                                </p>
+                                <div class="watch-btn-container">
+                                    <a asp-action="Details" asp-route-id="@movie.Id" class="watch-btn">
+                                        <i class="bx bx-play"></i> <span>Watch</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="swiper-button-next" id="hero-next"></div>
+            <div class="swiper-button-prev" id="hero-prev"></div>
+        </div>
+    </section>
 }
 
-<form asp-controller="Movies" asp-action="Index" method="get" class="mb-4">
-    <div class="row align-items-center">
-        <div class="col-auto">
-            <label class="col-form-label">Title:</label>
-        </div>
-        <div class="col-auto">
-            <input type="text" name="searchString" value="@Context.Request.Query["searchString"]" class="form-control" />
-        </div>
-        <div class="col-auto">
-            <input type="submit" value="Filter" class="btn btn-success" />
-        </div>
+<section class="movies custom-container" id="movies" style="margin-top: @(isSearch ? "40px" : "0px");">
+    <div class="heading-area">
+        <h2 class="heading-title">@(isSearch ? "Search Results" : "Trending Movies")</h2>
     </div>
-</form>
 
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>Poster</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Release Date</th>
-            <th>Duration (Mins)</th>
-            <th>Rating</th>
-            <th>Status</th>
-            <th style="width: 220px;">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @if (!string.IsNullOrEmpty(item.PosterUrl))
-                        {
-                            <img src="@item.PosterUrl" alt="Poster" style="width: 60px; height: auto; border-radius: 4px;" />
-                        }
-                        else
-                        {
-                            <span class="text-muted">No Poster</span>
-                        }
-                    </td>
-                    <td><strong>@item.Title</strong></td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(item.Description) && item.Description.Length > 50)
-                        {
-                            @(item.Description.Substring(0, 50) + "...")
-                        }
-                        else
-                        {
-                            @item.Description
-                        }
-                    </td>
-                    <td>@item.ReleaseDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.Duration mins</td>
-                    <td><span class="badge bg-secondary">@item.Rating</span></td>
-                    <td>
-                        @if (item.IsActive)
-                        {
-                            <span class="badge bg-success">Active</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger">Inactive</span>
-                        }
-                    </td>
-                    <td>
-                        <div class="mb-2 d-flex gap-1">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info flex-fill">Details</a>
+    @if (displayMovies != null && displayMovies.Any())
+    {
+        <div class="movies-swiper-wrapper" style="position: relative;">
 
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                            }
+            <div class="movies-content swiper">
+                <div class="swiper-wrapper">
+                    @foreach (var movie in displayMovies)
+                    {
+                        <div class="swiper-slide">
+                            <div class="movie-box-item">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <div class="admin-controls"
+                                         onclick="event.stopPropagation();"
+                                         style="position: absolute; top: 10px; right: 10px; z-index: 99999 !important; display: flex; gap: 12px; background: rgba(30, 35, 45, 0.85) !important; backdrop-filter: blur(5px); padding: 6px 14px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto !important;">
+
+                                        <a asp-controller="Movies" asp-action="Edit" asp-route-id="@movie.Id" class="text-warning" style="text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px; z-index: 100000 !important; pointer-events: auto !important; transition: 0.2s;">
+                                            <i class='bx bx-edit-alt' style="font-size: 1.1rem;"></i> Edit
+                                        </a>
+
+                                        <span style="color: rgba(255,255,255,0.2); align-self: center;">|</span>
+
+                                        <a asp-controller="Movies" asp-action="Delete" asp-route-id="@movie.Id" class="text-danger" style="text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 4px; z-index: 100000 !important; pointer-events: auto !important; transition: 0.2s;">
+                                            <i class='bx bx-trash' style="font-size: 1.1rem;"></i> Delete
+                                        </a>
+
+                                    </div>
+                                }
+
+                                <a asp-action="Details" asp-route-id="@movie.Id" class="movie-img-link">
+                                    <img src="@(movie.PosterUrl.StartsWith("http") ? movie.PosterUrl : Url.Content("~/" + movie.PosterUrl))" alt="@movie.Title" class="movie-poster-img">
+                                </a>
+
+                                <div class="box-text">
+                                    <h2 class="movie-text">@movie.Title</h2>
+                                    <span class="movietype">
+                                        <i class='bx bx-time-five'></i> @movie.Duration mins |
+                                        <i class='bx bxs-star' style="color: var(--main-color);"></i> @movie.Rating
+                                    </span>
+
+                                    <div class="watch-btn-container" style="margin-top: 12px;">
+                                        <a asp-action="Details" asp-route-id="@movie.Id" class="watch-btn">
+                                            <i class="bx bx-play"></i> <span>Watch</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    }
+                </div>
+            </div>
 
-                        <div class="d-flex gap-1">
-                            <button class="btn btn-sm btn-outline-danger favourite-btn flex-fill" data-movie-id="@item.Id">
-                                ❤️ <span class="fav-text">Favourite</span>
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary save-btn flex-fill" data-movie-id="@item.Id">
-                                🔖 <span class="save-text">Save</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="8" class="text-center text-muted">No movies found.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <div class="swiper-button-next" id="movies-next"></div>
+            <div class="swiper-button-prev" id="movies-prev"></div>
+        </div>
+    }
+    else
+    {
+        <div class="no-results-card text-center py-5 px-3" style="background: #11141a; border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 8px; margin-top: 20px;">
+            <i class='bx bx-search-alt' style="font-size: 3.5rem; color: var(--main-color); margin-bottom: 15px; display: block;"></i>
+            <h4 class="text-white" style="font-weight: 600;">No Movies Found</h4>
+            <p style="color: #8a8d93; font-size: 0.9rem; margin-bottom: 0;">
+                We couldn't find any results matching your search criteria.
+            </p>
+        </div>
+    }
+</section>
 
 @section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
 
-            // --- 1. Favourite Button AJAX ---
-            document.querySelectorAll('.favourite-btn').forEach(button => {
-                button.addEventListener('click', async function () {
-                    const movieId = this.getAttribute('data-movie-id');
-                    const textSpan = this.querySelector('.fav-text');
-
-                    try {
-                        const response = await fetch('/api/movies/toggle-favourite', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(parseInt(movieId))
-                        });
-
-                        if (response.ok) {
-                            const result = await response.json();
-                            if (result.isFavourite) {
-                                this.classList.remove('btn-outline-danger');
-                                this.classList.add('btn-danger');
-                                textSpan.textContent = 'Favorited';
-                            } else {
-                                this.classList.remove('btn-danger');
-                                this.classList.add('btn-outline-danger');
-                                textSpan.textContent = 'Favourite';
-                            }
-                        } else if (response.status === 401) {
-                            alert("Please login first to favourite this movie!");
-                        }
-                    } catch (error) {
-                        console.error("Error toggling favourite:", error);
-                    }
-                });
-            });
-
-            // --- 2. Save Button AJAX ---
-            document.querySelectorAll('.save-btn').forEach(button => {
-                button.addEventListener('click', async function () {
-                    const movieId = this.getAttribute('data-movie-id');
-                    const textSpan = this.querySelector('.save-text');
-
-                    try {
-                        const response = await fetch('/api/movies/toggle-save', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(parseInt(movieId))
-                        });
-
-                        if (response.ok) {
-                            const result = await response.json();
-                            if (result.isSaved) {
-                                this.classList.remove('btn-outline-primary');
-                                this.classList.add('btn-primary');
-                                textSpan.textContent = 'Saved';
-                            } else {
-                                this.classList.remove('btn-primary');
-                                this.classList.add('btn-outline-primary');
-                                textSpan.textContent = 'Save';
-                            }
-                        } else if (response.status === 401) {
-                            alert("Please login first to save this movie!");
-                        }
-                    } catch (error) {
-                        console.error("Error toggling save:", error);
-                    }
-                });
-            });
-
-        });
-    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 }

@@ -1,44 +1,79 @@
 ﻿@model IEnumerable<MVCMovie.Models.Category>
 
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = "Categories Management - DatShin";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2> Category Management</h2>
-        <a asp-action="Create" class="btn btn-dark">➕ Create New Category</a>
-    </div>
+<link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
 
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Category Name</th>
-                <th>Description</th>
-                <th style="width: 200px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
+<div class="container">
+    <div class="categories-management-container">
+
+        <div class="page-header-area">
+            <h2 class="page-title">
+                <i class='bx bx-category' style="color: var(--main-color, #ffc107); vertical-align: middle; margin-right: 8px;"></i>Categories / Genres
+            </h2>
+            @if (User.IsInRole("Admin"))
             {
-                foreach (var item in Model)
-                {
+                <a asp-action="Create" class="btn btn-create-category">
+                    <i class='bx bx-plus' style="font-size: 1.2rem;"></i> Add Category
+                </a>
+            }
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="custom-table">
+                <thead>
                     <tr>
-                        <td><strong>@item.CategoryName</strong></td>
-                        <td>@item.Description</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-warning text-dark">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-danger">Delete</a>
-                        </td>
+                        <th style="width: 30%;">Category Name</th>
+                        <th style="width: 45%;">Description</th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th style="width: 25%; text-align: center;">Actions</th>
+                        }
                     </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="3" class="text-center text-muted">No categories found.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td style="font-weight: 600; color: #fff;">
+                                    @item.CategoryName
+                                </td>
+                                <td class="text-muted">
+                                    @(string.IsNullOrEmpty(item.Description) ? "-" : item.Description)
+                                </td>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td style="text-align: center;">
+                                        <div class="action-box">
+                                            <a asp-action="Edit" asp-route-id="@item.CategoryId" class="action-link text-warning">
+                                                <i class='bx bx-edit-alt'></i> Edit
+                                            </a>
+                                            <span style="color: rgba(255,255,255,0.2);">|</span>
+                                            <a asp-action="Delete" asp-route-id="@item.CategoryId" class="action-link text-danger">
+                                                <i class='bx bx-trash'></i> Delete
+                                            </a>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">
+                                <i class='bx bx-info-circle' style="font-size: 1.5rem; display: block; margin-bottom: 5px;"></i>
+                                No categories found in database.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>

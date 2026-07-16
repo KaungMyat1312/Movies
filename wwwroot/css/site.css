@@ -29,3 +29,69 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* Login menu */
+
+.login-menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.user-name {
+    color: #fff;
+    font-weight: 600;
+}
+
+    .user-name i {
+        margin-right: 4px;
+    }
+
+.admin-btn {
+    font-weight: 600;
+}
+
+.icon-link {
+    color: #fff !important;
+    padding: 0;
+}
+
+.favourite-icon {
+    color: var(--main-color);
+    font-size: 1.3rem;
+}
+
+.bookmark-icon {
+    color: #ffc107;
+    font-size: 1.3rem;
+}
+
+.logout-btn {
+    padding: 5px 12px;
+    border-radius: 4px;
+}
+
+.login-btn {
+    background: var(--main-color);
+    color: #000 !important;
+    padding: 6px 15px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+    .login-btn:hover {
+        color: #000 !important;
+    }
+
+.register-btn {
+    color: rgba(255,255,255,.7) !important;
+    font-size: .9rem;
+}
+
+    .register-btn:hover {
+        color: #fff !important;
+        text-decoration: none;
+    }

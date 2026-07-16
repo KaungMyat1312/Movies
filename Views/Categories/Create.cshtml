@@ -1,40 +1,42 @@
 ﻿@model MVCMovie.Models.Category
 
 @{
-    ViewData["Title"] = "Create Category";
+    ViewData["Title"] = "Create Category - DatShin";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h4 class="mb-0">+ Add New Category</h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
 
-                        <div class="mb-3">
-                            <label asp-for="CategoryName" class="form-label fw-bold">Category Name</label>
-                            <input asp-for="CategoryName" class="form-control" placeholder="e.g. Action, Comedy, Sci-Fi" />
-                            <span asp-validation-for="CategoryName" class="text-danger"></span>
-                        </div>
+<div class="container">
+    <div class="create-movie-container" style="max-width: 650px; margin: 120px auto 50px auto;">
 
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label fw-bold">Description</label>
-                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter category description"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
+        <h2 class="create-title">
+            <i class='bx bx-plus-circle' style="color: var(--main-color, #ffc107); vertical-align: middle; margin-right: 8px;"></i>Add New Category
+        </h2>
 
-                        <div class="d-flex justify-content-between border-top pt-3">
-                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-                            <button type="submit" class="btn btn-dark px-4">Save</button>
-                        </div>
-                    </form>
-                </div>
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CategoryName" class="control-label">Category Name</label>
+                <input asp-for="CategoryName" class="form-control" placeholder="e.g. Action, Comedy, Sci-Fi" autocomplete="off" />
+                <span asp-validation-for="CategoryName" class="text-danger"></span>
             </div>
-        </div>
+
+            <div class="form-group mb-4">
+                <label asp-for="Description" class="control-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter category description..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group d-flex justify-content-between mt-4">
+                <a asp-action="Index" class="btn btn-back">
+                    <i class='bx bx-arrow-back' style="vertical-align: middle; margin-right: 4px;"></i> Back to List
+                </a>
+                <button type="submit" class="btn btn-submit">
+                    <i class='bx bx-save' style="vertical-align: middle; margin-right: 4px;"></i> Save Category
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 

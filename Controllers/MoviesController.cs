@@ -18,25 +18,32 @@ public class MoviesController : Controller
     {
         _context = context;
     }
-
-    
-
-    // GET: Movies
-    [Authorize(Roles = "Admin,Viewer")] 
-    public async Task<IActionResult> Index(string searchString)
+    // GET: Movies/Create
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Create()
     {
+        var viewModel = new MovieFormViewModel();
+
+        await PopulateCategoriesAsync(viewModel);
+
+        return View(viewModel);
+    }
+    [Authorize(Roles = "Admin,Viewer")]
+    public async Task<IActionResult> Index(string? searchString)
+    {
+        ViewData["IsSearch"] = !string.IsNullOrWhiteSpace(searchString);
+
         var movies = from m in _context.Movies select m;
 
         if (!string.IsNullOrEmpty(searchString))
         {
-            movies = movies.Where(s => s.Title!.Contains(searchString));
+            movies = movies.Where(s => s.Title != null && s.Title.ToLower().Contains(searchString.ToLower()));
         }
 
         return View(await movies.ToListAsync());
     }
 
-    // GET: Movies/Details/5
-    [Authorize(Roles = "Admin,Viewer")] 
+    [Authorize(Roles = "Admin,Viewer")]
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null) return BadRequest();
@@ -51,21 +58,11 @@ public class MoviesController : Controller
         return View(movie);
     }
 
-   
-
-    // GET: Movies/Create
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create()
-    {
-        var viewModel = new MovieFormViewModel();
-        await PopulateCategoriesAsync(viewModel);
-        return View(viewModel);
-    }
 
     // POST: Movies/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin")] 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(MovieFormViewModel viewModel)
     {
         if (ModelState.IsValid)
@@ -108,8 +105,8 @@ public class MoviesController : Controller
         return View(viewModel);
     }
 
-    // GET: Movies/Edit
-    [Authorize(Roles = "Admin")] 
+    //  GET: Movies/Edit/5
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null) return BadRequest();
@@ -137,7 +134,8 @@ public class MoviesController : Controller
         return View(viewModel);
     }
 
-    // POST: Movies/Edit/5
+    
+    //  POST: Movies/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin")]
@@ -194,12 +192,12 @@ public class MoviesController : Controller
         return View(viewModel);
     }
 
-    // GET: Movies/Delete/5
-    [Authorize(Roles = "Admin")] 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null) return BadRequest();
 
+       
         var movie = await _context.Movies
             .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -208,10 +206,12 @@ public class MoviesController : Controller
         return View(movie);
     }
 
-    // POST: Movies/Delete/5
+    
+    //  POST: Movies/Delete/5
+   
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin")] 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var movie = await _context.Movies.FindAsync(id);
@@ -222,8 +222,10 @@ public class MoviesController : Controller
         }
         return RedirectToAction(nameof(Index));
     }
+    
 
-    // Helper method to load categories and mark selected ones
+    
+    // Helper Method (Categories loading)
     private async Task PopulateCategoriesAsync(MovieFormViewModel viewModel, Movie? movie = null)
     {
         var allCategories = await _context.Categories.ToListAsync();
@@ -241,4 +243,4 @@ public class MoviesController : Controller
             IsSelected = assignedCategoryIds.Contains(c.CategoryId)
         }).ToList();
     }
-}
+}   

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MVCMovie.Models;
 using System.Linq;
@@ -35,6 +36,7 @@ public class CategoriesController : Controller
     }
 
     // GET: Categories/Create
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
@@ -43,6 +45,7 @@ public class CategoriesController : Controller
     // POST: Categories/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,Description")] Category category)
     {
         if (ModelState.IsValid)
@@ -55,6 +58,7 @@ public class CategoriesController : Controller
     }
 
     // GET: Categories/Edit/5
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null) return BadRequest();
@@ -68,6 +72,7 @@ public class CategoriesController : Controller
     // POST: Categories/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Description")] Category category)
     {
         if (id != category.CategoryId) return NotFound();
@@ -90,6 +95,7 @@ public class CategoriesController : Controller
     }
 
     // GET: Categories/Delete/5
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null) return BadRequest();
@@ -105,6 +111,7 @@ public class CategoriesController : Controller
     // POST: Categories/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var category = await _context.Categories.FindAsync(id);

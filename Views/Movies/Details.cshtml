@@ -1,170 +1,102 @@
 ﻿@model MVCMovie.Models.Movie
 
 @{
-    ViewData["Title"] = "Movie Details";
+    ViewData["Title"] = Model.Title + " - Details";
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0"> Movie Details</h4>
-            <div>
-                @if (Model.IsActive)
-                {
-                    <span class="badge bg-success">Active</span>
-                }
-                else
-                {
-                    <span class="badge bg-danger">Inactive</span>
-                }
+<link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
+
+<link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+
+<div class="container py-4">
+    <div class="details-wrapper">
+        <div class="details-bg-blur" style="background-image: url('@(Model.PosterUrl.StartsWith("http") ? Model.PosterUrl : Url.Content("~/" + Model.PosterUrl))');"></div>
+
+        <div class="row details-content g-4">
+
+            <div class="col-md-4 text-center">
+                <img src="@(Model.PosterUrl.StartsWith("http") ? Model.PosterUrl : Url.Content("~/" + Model.PosterUrl))"
+                     alt="@Model.Title"
+                     class="movie-detail-poster">
             </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 text-center mb-4 mb-md-0">
-                    @if (!string.IsNullOrEmpty(Model.PosterUrl))
+
+            <div class="col-md-8 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+                        <h1 class="text-white fw-bold m-0" style="font-size: 2.3rem;">@Model.Title</h1>
+                        <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")" style="padding: 6px 12px; font-weight: 600;">
+                            @(Model.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center gap-3 mb-4 mt-2">
+                        <span class="badge bg-warning text-dark px-2 py-1 fw-bold">R</span>
+                        <span class="meta-item"><i class='bx bx-time-five' style="color: #ffc107;"></i> @Model.Duration Mins</span>
+                        <span style="color: rgba(255,255,255,0.2);">|</span>
+                        <span class="meta-item"><i class='bx bx-calendar' style="color: #ffc107;"></i> @Model.ReleaseDate.ToString("yyyy MMMM dd")</span>
+                    </div>
+
+                    <hr style="border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+                    <h5 style="color: #ffc107; font-weight: 700; margin-bottom: 12px;">Description</h5>
+                    <p style="color: #cbd5e1; line-height: 1.7; font-size: 1.05rem; text-align: justify; margin-bottom: 25px;">
+                        @Model.Description
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="info-card">
+                                <h6 style="color: #8a8d93; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class='bx bxs-star' style="color: #ffc107; font-size: 1.1rem;"></i> IMDb Rating
+                                </h6>
+                                <p class="fw-bold text-white m-0" style="font-size: 1.3rem;">
+                                    @Model.Rating <span style="font-size: 0.9rem; color: #8a8d93; font-weight: 400;">/ 10</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="info-card d-flex flex-column justify-content-center">
+                                <h6 style="color: #8a8d93; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                    <i class='bx bx-video' style="color: #ffc107; font-size: 1.1rem;"></i> Official Trailer
+                                </h6>
+                                @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+                                {
+                                    <a href="@Model.TrailerUrl" target="_blank" class="watch-btn" style="padding: 6px 16px; font-size: 0.9rem; width: fit-content; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class='bx bx-play-circle'></i> Watch Trailer
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span style="color: #64748b; font-size: 0.95rem; font-style: italic;">No Trailer Available</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-5 pt-3" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                    <a asp-action="Index" class="btn btn-back">
+                        <i class='bx bx-arrow-back'></i> Back to List
+                    </a>
+
+                    @if (User.IsInRole("Admin") || User.Identity?.Name == "admin@movie.com")
                     {
-                        <img src="@Model.PosterUrl" alt="@Model.Title Poster" class="img-fluid rounded shadow-sm" style="max-height: 450px; width: 100%; object-fit: cover;" />
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-submit ms-auto">
+                            <i class='bx bx-edit-alt'></i> Edit Movie
+                        </a>
                     }
                     else
                     {
-                        <div class="bg-light d-flex align-items-center justify-content-center rounded border" style="height: 400px;">
-                            <span class="text-muted">No Poster Available</span>
+                        <div class="ms-auto d-flex gap-2">
+                            <button class="btn-action-outline text-danger"><i class='bx bx-heart'></i> Favourite</button>
+                            <button class="btn-action-outline text-info"><i class='bx bx-bookmark'></i> Save</button>
                         </div>
                     }
                 </div>
 
-                <div class="col-md-8">
-                    <h2 class="text-primary mb-2">@Model.Title</h2>
-                    <p class="text-muted mb-4"><span class="badge bg-secondary me-2">@Model.Rating</span> | <i class="bi bi-clock"></i> @Model.Duration Mins</p>
-
-                    <h5 class="fw-bold">Description</h5>
-                    <p class="text-secondary" style="line-height: 1.6; text-align: justify;">
-                        @(string.IsNullOrEmpty(Model.Description) ? "No description provided for this movie." : Model.Description)
-                    </p>
-
-                    <hr />
-
-                    <div class="row g-3">
-                        <div class="col-sm-4">
-                            <span class="text-muted d-block">Release Date</span>
-                            <strong>@Model.ReleaseDate.ToString("yyyy MMMM dd")</strong>
-                        </div>
-                        <div class="col-sm-8">
-                            <span class="text-muted d-block">Trailer Link</span>
-                            @if (!string.IsNullOrEmpty(Model.TrailerUrl))
-                            {
-                                <a href="@Model.TrailerUrl" target="_blank" class="btn btn-sm btn-outline-danger mt-1">
-                                    <i class="bi bi-youtube"></i> Watch Trailer
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="text-muted">No trailer link available</span>
-                            }
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between border-top mt-5 pt-3">
-                        <div class="d-flex gap-2">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Back to List
-                            </a>
-
-                            <button class="btn btn-outline-danger favourite-btn" data-movie-id="@Model.Id">
-                                ❤️ <span class="fav-text">Favourite</span>
-                            </button>
-
-                            <button class="btn btn-outline-primary save-btn" data-movie-id="@Model.Id">
-                                🔖 <span class="save-text">Save</span>
-                            </button>
-                        </div>
-
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning px-4 text-dark fw-bold">
-                                <i class="bi bi-pencil-square"></i> Edit Movie
-                            </a>
-                        }
-                    </div>
-                </div>
             </div>
         </div>
+
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            // --- 1. Favourite AJAX ---
-            const favBtn = document.querySelector('.favourite-btn');
-            if (favBtn) {
-                favBtn.addEventListener('click', async function () {
-                    const movieId = this.getAttribute('data-movie-id');
-                    const textSpan = this.querySelector('.fav-text');
-
-                    try {
-                        const response = await fetch('/api/movies/toggle-favourite', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(parseInt(movieId))
-                        });
-
-                        if (response.ok) {
-                            const result = await response.json();
-                            if (result.isFavourite) {
-                                this.classList.remove('btn-outline-danger');
-                                this.classList.add('btn-danger');
-                                textSpan.textContent = 'Favorited';
-                            } else {
-                                this.classList.remove('btn-danger');
-                                this.classList.add('btn-outline-danger');
-                                textSpan.textContent = 'Favourite';
-                            }
-                        } else if (response.status === 401) {
-                            alert("Please login first to favourite this movie!");
-                        }
-                    } catch (error) {
-                        console.error("Error toggling favourite:", error);
-                    }
-                });
-            }
-
-            // --- 2. Save AJAX ---
-            const saveBtn = document.querySelector('.save-btn');
-            if (saveBtn) {
-                saveBtn.addEventListener('click', async function () {
-                    const movieId = this.getAttribute('data-movie-id');
-                    const textSpan = this.querySelector('.save-text');
-
-                    try {
-                        const response = await fetch('/api/movies/toggle-save', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(parseInt(movieId))
-                        });
-
-                        if (response.ok) {
-                            const result = await response.json();
-                            if (result.isSaved) {
-                                this.classList.remove('btn-outline-primary');
-                                this.classList.add('btn-primary');
-                                textSpan.textContent = 'Saved';
-                            } else {
-                                this.classList.remove('btn-primary');
-                                this.classList.add('btn-outline-primary');
-                                textSpan.textContent = 'Save';
-                            }
-                        } else if (response.status === 401) {
-                            alert("Please login first to save this movie!");
-                        }
-                    } catch (error) {
-                        console.error("Error toggling save:", error);
-                    }
-                });
-            }
-
-        });
-    </script>
-}

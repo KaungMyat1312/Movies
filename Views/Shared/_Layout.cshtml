@@ -3,53 +3,63 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MVCMovie</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - DatShin</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MVCMovie.styles.css" asp-append-version="true" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="~/css/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MVCMovie</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
-                        </li>
-                    </ul>
+        <div class="nav custom-container" style="display: flex; align-items: center; justify-content: space-between;">
+            <a asp-controller="Movies" asp-action="Index" style="font-size: 2rem; font-weight: 700; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                Dat<span style="color: var(--main-color);">Shin</span> <i class='bx bx-camera-movie' style="color: var(--main-color);"></i>
+            </a>
 
-                    <partial name="_LoginPartial" />
-                </div>
+            <div class="search-box-container">
+                <form asp-controller="Movies" asp-action="Index" method="get" class="search-form">
+                    <input type="text" name="searchString" placeholder="search movie" class="search-input" />
+                    <button type="submit" class="search-submit-btn">
+                        <i class='bx bx-search'></i>
+                    </button>
+                </form>
             </div>
-        </nav>
+
+            <!-- Login standard partial section -->
+            <div class="login-section">
+                <partial name="_LoginPartial" />
+            </div>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <div class="navbar">
+        <a asp-controller="Movies" asp-action="Index" class="nav-link">
+            <i class='bx bx-home'></i><span class="nav-link-title">Home</span>
+        </a>
+        <a asp-controller="Movies" asp-action="Index" class="nav-link">
+            <i class='bx bxs-hot'></i><span class="nav-link-title">Trending</span>
+        </a>
+        <a asp-controller="Movies" asp-action="Favourites" class="nav-link">
+            <i class='bx bxs-heart'></i><span class="nav-link-title">Favourites</span>
+        </a>
+        <a asp-controller="Movies" asp-action="Saved" class="nav-link">
+            <i class='bx bxs-bookmark'></i><span class="nav-link-title">Watch Later</span>
+        </a>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - MVCMovie - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    @RenderBody()
+
+    <div class="coyright">
+        <p>&#169; DAT Shin All right Copy reserve </p>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/swiper-bundle.min.js"></script>
+    <script src="~/js/main.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

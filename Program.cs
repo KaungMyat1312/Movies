@@ -1,31 +1,37 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MVCMovie.Models;
-using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add MVC services
 builder.Services.AddControllersWithViews();
 
-// Database Context 
-builder.Services.AddDbContext<MVCMovie.Models.MovieContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MvcMovieContext") ?? throw new InvalidOperationException("Connection string 'MvcMovieContext' not found.")));
+// Configure database
+builder.Services.AddDbContext<MovieContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("MvcMovieContext")
+        ?? throw new InvalidOperationException("Connection string not found.")));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>() 
-    .AddEntityFrameworkStores<MVCMovie.Models.MovieContext>();
-
-builder.Services.AddAuthentication()
-    .AddGoogle(googleOptions =>
+// Configure Identity
+builder.Services
+    .AddDefaultIdentity<ApplicationUser>(options =>
     {
-        googleOptions.ClientId = "465605212867-nrt792keabjqovvtd7skqcde8u57nieh.apps.googleusercontent.com";
-        googleOptions.ClientSecret = "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";
-    });
+        options.SignIn.RequireConfirmedAccount = false;
+    })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<MovieContext>();
+
+// Cookie settings
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Home/AccessDenied";
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -33,76 +39,74 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// .NET 8.0 Static Files Handling
 app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
+// Route Configuration (.NET 8.0 Compatible)
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Movies}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
-
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-    string[] roleNames = { "Admin", "Viewer" };
-    foreach (var roleName in roleNames)
-    {
-        if (!await roleManager.RoleExistsAsync(roleName))
-        {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
-        }
-    }
-
-    string adminEmail = "admin@movie.com";
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    if (adminUser == null)
-    {
-        var newAdmin = new ApplicationUser
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
-        var createAdmin = await userManager.CreateAsync(newAdmin, "Admin@123");
-        if (createAdmin.Succeeded)
-        {
-            await userManager.AddToRoleAsync(newAdmin, "Admin");
-        }
-    }
-
-    string viewerEmail = "viewer@movie.com";
-    var viewerUser = await userManager.FindByEmailAsync(viewerEmail);
-    if (viewerUser == null)
-    {
-        var newViewer = new ApplicationUser
-        {
-            UserName = viewerEmail,
-            Email = viewerEmail,
-            EmailConfirmed = true
-        };
-        var createViewer = await userManager.CreateAsync(newViewer, "Viewer@123");
-        if (createViewer.Succeeded)
-        {
-            await userManager.AddToRoleAsync(newViewer, "Viewer");
-        }
-    }
-}
+// Create default roles and users (Development Only)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    MVCMovie.Models.SeedData.Initialize(services);
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+    string[] roles = { "Admin", "Viewer" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    // Development seed users only - remove in production!
+    if (app.Environment.IsDevelopment())
+    {
+        await CreateUserAsync(userManager, "admin@movie.com", "Admin@123", "Admin");
+        await CreateUserAsync(userManager, "viewer@movie.com", "Viewer@123", "Viewer");
+    }
+
+    SeedData.Initialize(services);
 }
 
-app.Run(); 
+app.Run();
 
-app.Run(); 
+static async Task CreateUserAsync(
+    UserManager<ApplicationUser> userManager,
+    string email,
+    string password,
+    string role)
+{
+    var user = await userManager.FindByEmailAsync(email);
+
+    if (user != null)
+        return;
+
+    user = new ApplicationUser
+    {
+        UserName = email,
+        Email = email,
+        EmailConfirmed = true
+    };
+
+    var result = await userManager.CreateAsync(user, password);
+
+    if (result.Succeeded)
+    {
+        await userManager.AddToRoleAsync(user, role);
+    }
+}
