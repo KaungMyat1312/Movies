@@ -4,25 +4,30 @@ using MVCMovie.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add MVC services
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configure database
+// Database Connection
 builder.Services.AddDbContext<MovieContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("MvcMovieContext")
-        ?? throw new InvalidOperationException("Connection string not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MvcMovieContext")));
 
-// Configure Identity
-builder.Services
-    .AddDefaultIdentity<ApplicationUser>(options =>
-    {
-        options.SignIn.RequireConfirmedAccount = false;
-    })
+// Identity Setup
+builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<MovieContext>();
 
-// Cookie settings
+// Password Configuration
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.SignIn.RequireConfirmedAccount = false;
+});
+
+// Cookie Configuration for Login Path
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Identity/Account/Login";
@@ -31,7 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-// Configure middleware
+// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -39,8 +44,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// .NET 8.0 Static Files Handling
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -48,65 +51,70 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Route Configuration (.NET 8.0 Compatible)
+// Default Route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Movies}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 
-// Create default roles and users (Development Only)
+// Seed Roles and Users
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-    string[] roles = { "Admin", "Viewer" };
-
-    foreach (var role in roles)
+    // Create Admin Role if not exists
+    if (!await roleManager.RoleExistsAsync("Admin"))
     {
-        if (!await roleManager.RoleExistsAsync(role))
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+
+    // Create Viewer Role if not exists
+    if (!await roleManager.RoleExistsAsync("Viewer"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Viewer"));
+    }
+
+    // Create Default Admin User
+    var admin1 = await userManager.FindByEmailAsync("admin@movie.com");
+    if (admin1 == null)
+    {
+        var newAdmin1 = new ApplicationUser { UserName = "admin@movie.com", Email = "admin@movie.com", EmailConfirmed = true };
+        var result = await userManager.CreateAsync(newAdmin1, "Admin@123");
+        if (result.Succeeded)
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            await userManager.AddToRoleAsync(newAdmin1, "Admin");
         }
     }
 
-    // Development seed users only - remove in production!
-    if (app.Environment.IsDevelopment())
+    // Create Second Admin User
+    var admin2 = await userManager.FindByEmailAsync("newadmin@movie.com");
+    if (admin2 == null)
     {
-        await CreateUserAsync(userManager, "admin@movie.com", "Admin@123", "Admin");
-        await CreateUserAsync(userManager, "viewer@movie.com", "Viewer@123", "Viewer");
+        var newAdmin2 = new ApplicationUser { UserName = "newadmin@movie.com", Email = "newadmin@movie.com", EmailConfirmed = true };
+        var result = await userManager.CreateAsync(newAdmin2, "Admin@123");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newAdmin2, "Admin");
+        }
     }
 
+    // Create Viewer User
+    var viewer = await userManager.FindByEmailAsync("viewer@movie.com");
+    if (viewer == null)
+    {
+        var newViewer = new ApplicationUser { UserName = "viewer@movie.com", Email = "viewer@movie.com", EmailConfirmed = true };
+        var result = await userManager.CreateAsync(newViewer, "Viewer@123");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newViewer, "Viewer");
+        }
+    }
+
+    // Run original seed data
     SeedData.Initialize(services);
 }
 
-app.Run();
-
-static async Task CreateUserAsync(
-    UserManager<ApplicationUser> userManager,
-    string email,
-    string password,
-    string role)
-{
-    var user = await userManager.FindByEmailAsync(email);
-
-    if (user != null)
-        return;
-
-    user = new ApplicationUser
-    {
-        UserName = email,
-        Email = email,
-        EmailConfirmed = true
-    };
-
-    var result = await userManager.CreateAsync(user, password);
-
-    if (result.Succeeded)
-    {
-        await userManager.AddToRoleAsync(user, role);
-    }
-}
+app.Run();  

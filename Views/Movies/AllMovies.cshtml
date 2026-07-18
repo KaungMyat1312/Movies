@@ -1,0 +1,82 @@
+﻿@model IEnumerable<MVCMovie.Models.Movie>
+
+@{
+    ViewData["Title"] = "All Movies - DatShin";
+
+    var displayMovies = Model != null
+        ? (User.IsInRole("Admin") ? Model : Model.Where(m => m.IsActive))
+        : Enumerable.Empty<MVCMovie.Models.Movie>();
+}
+
+<section class="movies custom-container" id="all-movies" style="margin-top: 40px;">
+    <div class="heading-area" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h2 class="heading-title" style="margin: 0;">Explore All Movies</h2>
+    </div>
+
+    @if (displayMovies.Any())
+    {
+        <div class="movies-search-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+            @foreach (var movie in displayMovies)
+            {
+                var isAdmin = User.IsInRole("Admin");
+                var movieTitle = movie.Title ?? "Untitled Movie";
+                var movieDuration = movie.Duration;
+                var movieRating = movie.Rating;
+
+                string posterPath;
+                if (!string.IsNullOrEmpty(movie.PosterUrl))
+                {
+                    if (movie.PosterUrl.StartsWith("http"))
+                    {
+                        posterPath = movie.PosterUrl;
+                    }
+                    else
+                    {
+                        posterPath = Url.Content("~/" + movie.PosterUrl);
+                    }
+                }
+                else
+                {
+                    posterPath = Url.Content("~/images/no-poster.png");
+                }
+
+                <div class="movie-box-item" style="position: relative;">
+                    @if (isAdmin)
+                    {
+                        <div class="admin-controls" onclick="event.stopPropagation();" style="position: absolute; top: 10px; right: 10px; z-index: 99999; display: flex; gap: 12px; background: rgba(30, 35, 45, 0.85); backdrop-filter: blur(5px); padding: 6px 14px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                            <a asp-controller="Movies" asp-action="Edit" asp-route-id="@movie.Id" class="text-warning" style="text-decoration: none; font-weight: 700;">
+                                <i class='bx bx-edit-alt'></i> Edit
+                            </a>
+                            <span style="color: rgba(255,255,255,0.2);">|</span>
+                            <a asp-controller="Movies" asp-action="Delete" asp-route-id="@movie.Id" class="text-danger" style="text-decoration: none; font-weight: 700;">
+                                <i class='bx bx-trash'></i> Delete
+                            </a>
+                        </div>
+                    }
+
+                    <a asp-action="Details" asp-route-id="@movie.Id" class="movie-img-link">
+                        <img src="@posterPath" alt="Poster" class="movie-poster-img" style="width: 100%; height: 320px; object-fit: cover; border-radius: 8px;">
+                    </a>
+
+                    <div class="box-text" style="padding-top: 10px;">
+                        <h2 class="movie-text" style="font-size: 1.1rem; margin-bottom: 5px;">@movieTitle</h2>
+                        <span class="movietype">
+                            <i class='bx bx-time-five'></i> @movieDuration mins |
+                            <i class='bx bxs-star' style="color: var(--main-color);"></i> @movieRating
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-results-card text-center py-5 px-3" style="background: #11141a; border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 8px; margin-top: 20px;">
+            <i class='bx bx-movie-play' style="font-size: 3.5rem; color: var(--main-color); margin-bottom: 15px; display: block;"></i>
+            <h4 class="text-white" style="font-weight: 600;">No Movies Available</h4>
+            <p style="color: #8a8d93; font-size: 0.9rem; margin-bottom: 0;">
+                There are no movies to display right now.
+            </p>
+        </div>
+    }
+</section>

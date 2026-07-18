@@ -33,17 +33,29 @@
     </header>
 
     <div class="navbar">
+        <!-- Home Link -->
         <a asp-controller="Movies" asp-action="Index" class="nav-link">
             <i class='bx bx-home'></i><span class="nav-link-title">Home</span>
         </a>
-        <a asp-controller="Movies" asp-action="Index" class="nav-link">
-            <i class='bx bxs-hot'></i><span class="nav-link-title">Trending</span>
+
+        <!-- Movies Link -->
+        <a asp-controller="Movies" asp-action="AllMovies" class="nav-link">
+            <i class='bx bx-video'></i><span class="nav-link-title">Movies</span>
         </a>
-        <a asp-controller="Movies" asp-action="Favourites" class="nav-link">
+
+        <!-- Favourites Link linked -->
+        <a asp-controller="Profile" asp-action="Favourites" class="nav-link">
             <i class='bx bxs-heart'></i><span class="nav-link-title">Favourites</span>
         </a>
-        <a asp-controller="Movies" asp-action="Saved" class="nav-link">
+
+        <!-- Watch Later Link linked -->
+        <a asp-controller="Profile" asp-action="Saved" class="nav-link">
             <i class='bx bxs-bookmark'></i><span class="nav-link-title">Watch Later</span>
+        </a>
+
+        <!-- Profile Information -->
+        <a asp-controller="Profile" asp-action="Index" class="nav-link">
+            <i class='bx bx-user-circle'></i><span class="nav-link-title">Profile</span>
         </a>
     </div>
 

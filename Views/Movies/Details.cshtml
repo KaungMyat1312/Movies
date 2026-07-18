@@ -2,24 +2,30 @@
 
 @{
     ViewData["Title"] = Model.Title + " - Details";
+
+    // Fallback poster logic if PosterUrl is null or empty
+    var hasPoster = !string.IsNullOrEmpty(Model.PosterUrl);
+    var posterSrc = hasPoster && Model.PosterUrl!.StartsWith("http")
+        ? Model.PosterUrl
+        : Url.Content("~/" + (hasPoster ? Model.PosterUrl : "images/no-poster.png"));
 }
 
 <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
-
 <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
 
 <div class="container py-4">
     <div class="details-wrapper">
-        <div class="details-bg-blur" style="background-image: url('@(Model.PosterUrl.StartsWith("http") ? Model.PosterUrl : Url.Content("~/" + Model.PosterUrl))');"></div>
+        <!-- Safely render background blur dynamic styling -->
+        <div class="details-bg-blur" style="background-image: url('@posterSrc');"></div>
 
         <div class="row details-content g-4">
 
+            <!-- Movie Poster Section -->
             <div class="col-md-4 text-center">
-                <img src="@(Model.PosterUrl.StartsWith("http") ? Model.PosterUrl : Url.Content("~/" + Model.PosterUrl))"
-                     alt="@Model.Title"
-                     class="movie-detail-poster">
+                <img src="@posterSrc" alt="@Model.Title" class="movie-detail-poster">
             </div>
 
+            <!-- Movie Info Content Section -->
             <div class="col-md-8 d-flex flex-column justify-content-between">
                 <div>
                     <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
@@ -40,7 +46,7 @@
 
                     <h5 style="color: #ffc107; font-weight: 700; margin-bottom: 12px;">Description</h5>
                     <p style="color: #cbd5e1; line-height: 1.7; font-size: 1.05rem; text-align: justify; margin-bottom: 25px;">
-                        @Model.Description
+                        @(string.IsNullOrEmpty(Model.Description) ? "No description available for this movie." : Model.Description)
                     </p>
 
                     <div class="row g-3">
@@ -75,13 +81,15 @@
                     </div>
                 </div>
 
+                <!-- Footer Action Buttons -->
                 <div class="d-flex flex-wrap gap-2 mt-5 pt-3" style="border-top: 1px solid rgba(255,255,255,0.08);">
                     <a asp-action="Index" class="btn btn-back">
                         <i class='bx bx-arrow-back'></i> Back to List
                     </a>
 
-                    @if (User.IsInRole("Admin") || User.Identity?.Name == "admin@movie.com")
+                    @if (User.IsInRole("Admin") || User.Identity?.Name?.ToLower() == "admin@movie.com")
                     {
+                        <!-- 🎯 Edit Action Link with correct Id Route binding -->
                         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-submit ms-auto">
                             <i class='bx bx-edit-alt'></i> Edit Movie
                         </a>
@@ -89,8 +97,39 @@
                     else
                     {
                         <div class="ms-auto d-flex gap-2">
-                            <button class="btn-action-outline text-danger"><i class='bx bx-heart'></i> Favourite</button>
-                            <button class="btn-action-outline text-info"><i class='bx bx-bookmark'></i> Save</button>
+                            <!-- Favourite Form & Toggle Button -->
+                            <form asp-controller="Profile" asp-action="AddToFavourite" method="post" style="display: inline;">
+                                <input type="hidden" name="movieId" value="@Model.Id" />
+                                @if (ViewBag.IsFavorited == true)
+                                {
+                                    <button type="submit" class="btn-action-outline text-danger active" style="background-color: rgba(220, 53, 69, 0.1); border-color: #dc3545;">
+                                        <i class='bx bxs-heart'></i> Favourited
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn-action-outline text-danger">
+                                        <i class='bx bx-heart'></i> Favourite
+                                    </button>
+                                }
+                            </form>
+
+                            <!-- Watch Later Form & Toggle Button -->
+                            <form asp-controller="Profile" asp-action="AddToSave" method="post" style="display: inline;">
+                                <input type="hidden" name="movieId" value="@Model.Id" />
+                                @if (ViewBag.IsSaved == true)
+                                {
+                                    <button type="submit" class="btn-action-outline text-info active" style="background-color: rgba(13, 202, 240, 0.1); border-color: #0dcaf0;">
+                                        <i class='bx bxs-bookmark'></i> Saved
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn-action-outline text-info">
+                                        <i class='bx bx-bookmark'></i> Save
+                                    </button>
+                                }
+                            </form>
                         </div>
                     }
                 </div>
